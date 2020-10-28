@@ -1,0 +1,116 @@
+#include<stdio.h>
+#include<stdlib.h>
+
+struct Node
+{
+    int data;
+    struct Node* next;
+};
+
+struct Node* SortedMerge(struct Node* a, struct Node* b);
+void FrontBacksplit(struct Node* source, struct Node** headfor, struct Node** headbak);
+
+void MergeSort(struct Node** headref)
+{
+    struct Node* head = *headref;
+    struct Node* a;
+    struct Node* b;
+
+    if ((head == NULL) || (head->next == NULL))
+    {   
+        return;
+    }
+
+    FrontBacksplit(head, &a, &b);
+
+    MergeSort(&a);
+    MergeSort(&b);
+
+    *headref = SortedMerge(a, b); 
+}
+
+struct Node* SortedMerge(struct Node* a, struct Node * b)
+{
+    struct Node* result = NULL;
+
+    if(a == NULL)
+        return(b);
+    else if(b == NULL)
+        return(a);
+    if(a->data <= b->data)
+    {
+        result = a;
+        result->next = SortedMerge(a->next, b);
+    }
+    else
+    {
+        result = b;
+        result->next = SortedMerge(a, b->next);
+    }
+    return (result);
+}
+
+void FrontBacksplit(struct Node* source, struct Node** headfor, struct Node** headbak)
+{
+    struct Node* fast; 
+    struct Node* slow; 
+    slow = source; 
+    fast = source->next;
+
+    while(fast != NULL)
+    {
+        fast = fast->next;
+        if(fast != NULL)
+        {
+        slow = slow->next;
+        fast = fast->next;
+        }
+    }
+
+    *headfor = source;
+    *headbak = slow->next;
+    slow->next = NULL;  
+
+}
+
+void Push(struct Node** head_ref, int new_data) 
+{ 
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node)); 
+  
+    new_node->data = new_data; 
+  
+    new_node->next = (*head_ref); 
+  
+    (*head_ref) = new_node; 
+} 
+
+void Print(struct Node* tempA)
+{
+    while(tempA != NULL)
+    {
+        printf("%d \n", tempA->data);
+        tempA = tempA->next;
+    }
+}
+
+int main()
+{
+    struct Node * a = NULL;
+    struct Node *res = NULL;
+
+    printf("The Unsorted Linked lsit is: \n");
+    Push(&a, 10);
+    Push(&a, 45);
+    Push(&a, 23);
+    Push(&a, 20);
+    Push(&a, 67);
+    Push(&a, 5);
+    Print(a);
+
+    MergeSort(&a);
+    printf("The Sorted list is: \n");
+    Print(a);
+
+    return 0;
+
+}
